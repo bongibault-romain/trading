@@ -7,11 +7,10 @@ export default function Home() {
       <div className="col-span-4">
         <Chat />
       </div>
-      <div className="col-span-5">
-        <span>Your Inventory</span>
-        <div>
-          <Inventory />
-        </div>
+      <div className="col-span-5 flex flex-col gap-4">
+          <Inventory title={"Your Inventory"} />
+          <Inventory title={"Inventory of Elsa"} />
+        
       </div>
     </main>
   );

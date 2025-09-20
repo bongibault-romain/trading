@@ -9,7 +9,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { isConnected, isStarted, me, other, offer, submitOffer, cancelOffer, answerOffer } = useSocket();
+  const {
+    isConnected,
+    isStarted,
+    me,
+    other,
+    offer,
+    submitOffer,
+    cancelOffer,
+    answerOffer,
+  } = useSocket();
   const [submittingOffer, setSubmittingOffer] = useState(false);
   const router = useRouter();
 
@@ -17,7 +26,7 @@ export default function Home() {
     if (isStarted && isConnected) return;
 
     router.push("/");
-  }, [isStarted, isConnected]);
+  }, [isStarted, isConnected, router]);
 
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [selectedOtherItemIds, setSelectedOtherItemIds] = useState<string[]>(
@@ -45,7 +54,7 @@ export default function Home() {
       .finally(() => {
         setSubmittingOffer(false);
       });
-  }
+  };
 
   const handleCancelOffer = () => {
     if (!offer) return;
@@ -57,20 +66,20 @@ export default function Home() {
       .finally(() => {
         setSubmittingOffer(false);
       });
-  }
+  };
 
   const handleAnswerOffer = (accept: boolean) => {
     return () => {
       answerOffer(accept).catch(alert);
-    }
-  }
+    };
+  };
 
   useEffect(() => {
     if (!offer) {
       setSelectedItemIds([]);
       setSelectedOtherItemIds([]);
     }
-  }, [offer])
+  }, [offer]);
 
   return (
     <>
@@ -93,8 +102,8 @@ export default function Home() {
               <p className="text-justify">
                 <strong>Tips: </strong> Select the items you want to give to{" "}
                 {other?.nickname} from your inventory and select the items you
-                want to receive from {other?.nickname}'s inventory. Then click
-                "Make an Offer" to propose the trade.
+                want to receive from {other?.nickname}&apos;s inventory. Then
+                click &quot;Make an Offer&quot; to propose the trade.
               </p>
             </div>
 
@@ -109,7 +118,9 @@ export default function Home() {
 
               {offer && (
                 <div className="absolute inset-0 bg-black/70 pointer-events-none flex items-center justify-center">
-                  <p className="text-white text-center">Waiting for {other?.nickname} to respond...</p>
+                  <p className="text-white text-center">
+                    Waiting for {other?.nickname} to respond...
+                  </p>
                 </div>
               )}
             </div>
@@ -124,18 +135,32 @@ export default function Home() {
               />
               {offer && (
                 <div className="absolute inset-0 bg-black/70 pointer-events-none flex items-center justify-center">
-                  <p className="text-white text-center">Waiting for {other?.nickname} to respond...</p>
+                  <p className="text-white text-center">
+                    Waiting for {other?.nickname} to respond...
+                  </p>
                 </div>
               )}
             </div>
 
             <div className="flex justify-end">
               {offer && offer.playerId === me?.id ? (
-                <Button variant="danger" onClick={handleCancelOffer} disabled={submittingOffer}>
+                <Button
+                  variant="danger"
+                  onClick={handleCancelOffer}
+                  disabled={submittingOffer}
+                >
                   {submittingOffer ? "Cancelling..." : "Cancel Offer"}
                 </Button>
               ) : (
-                <Button variant="primary" onClick={handleSubmitOffer} disabled={submittingOffer || selectedItemIds.length === 0 && selectedOtherItemIds.length === 0}>
+                <Button
+                  variant="primary"
+                  onClick={handleSubmitOffer}
+                  disabled={
+                    submittingOffer ||
+                    (selectedItemIds.length === 0 &&
+                      selectedOtherItemIds.length === 0)
+                  }
+                >
                   {submittingOffer ? "Making Offer..." : "Make an Offer"}
                 </Button>
               )}
@@ -148,8 +173,12 @@ export default function Home() {
         <OfferModal
           onAccept={handleAnswerOffer(true)}
           onDecline={handleAnswerOffer(false)}
-          givenItems={me?.inventory.filter((item) => offer.receivedItemIds.includes(item.id))}
-          receivedItems={other?.inventory.filter((item) => offer.offeredItemIds.includes(item.id))}
+          givenItems={me?.inventory.filter((item) =>
+            offer.receivedItemIds.includes(item.id)
+          )}
+          receivedItems={other?.inventory.filter((item) =>
+            offer.offeredItemIds.includes(item.id)
+          )}
         />
       )}
     </>

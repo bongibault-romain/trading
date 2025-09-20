@@ -23,7 +23,7 @@ export default function Home() {
     if (!isStarted) return;
 
     router.push('/trade');
-  }, [isStarted]);
+  }, [isStarted, router]);
 
   return (
     <main className="w-screen h-screen flex flex-col items-center justify-center">

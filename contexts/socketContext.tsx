@@ -32,6 +32,7 @@ interface SocketContextType {
     receivedItemIds: string[]
   ) => Promise<void>;
   cancelOffer: () => Promise<void>;
+  answerOffer: (accept: boolean) => Promise<void>;
 }
 
 export const SocketContext = createContext<SocketContextType | null>(null);
@@ -104,6 +105,24 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
           if (!accepted) return reject("Cancel offer not accepted by server.");
 
           setOffer(null);
+          resolve();
+        }
+      );
+    });
+  }
+
+  function answerOffer(accept: boolean) {
+    return new Promise<void>((resolve, reject) => {
+      if (!socket) return reject("No socket connection available.");
+      if (!offer) return reject("No offer to answer.");
+
+      socket.emit(
+        "answerOffer",
+        { accept },
+        (accepted: boolean, error: string | undefined) => {
+          if (error) return reject(error);
+          if (!accepted) return reject("Answer offer not accepted by server.");
+
           resolve();
         }
       );
@@ -185,12 +204,65 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
       ]);
     }
 
+    function handleNewOffer({
+      offer,
+    }: {
+      offer: {
+        playerId: string;
+        offeredItemIds: string[];
+        receivedItemIds: string[];
+      };
+    }) {
+      setOffer(offer);
+    }
+
+    function handleOfferCancelled() {
+      setOffer(null);
+    }
+
+    function handleOfferAccepted({
+      offeringPlayerId,
+      receivingPlayerId,
+      offeredInventory,
+      receivedInventory,
+    }: {
+      offeringPlayerId: string;
+      receivingPlayerId: string;
+      offeredInventory: { id: string; name: string }[];
+      receivedInventory: { id: string; name: string }[];
+    }) {
+      setOffer(null);
+      setMe((prevMe) => {
+        if (!prevMe) return prevMe;
+        
+        return {
+          ...prevMe,
+          inventory: prevMe.id === offeringPlayerId ? offeredInventory : receivedInventory,
+        };
+      });
+
+      setOther((prevOther) => {
+        if (!prevOther) return prevOther;
+
+        return {
+          ...prevOther,
+          inventory: prevOther.id === receivingPlayerId ? receivedInventory : offeredInventory,
+        };
+      });
+    }
+
+    socket.on("offerAccepted", handleOfferAccepted);
+    socket.on("offerCancelled", handleOfferCancelled);
+    socket.on("newOffer", handleNewOffer);
     socket.on("joinedRoom", handleJoinedRoom);
     socket.on("gameStarting", handleGameStarting);
     socket.on("disconnect", handleDisconnect);
     socket.on("chatMessage", handleChatMessage);
 
     return () => {
+      socket.off("offerAccepted", handleOfferAccepted);
+      socket.off("offerCancelled", handleOfferCancelled);
+      socket.off("newOffer", handleNewOffer);
       socket.off("joinedRoom", handleJoinedRoom);
       socket.off("gameStarting", handleGameStarting);
       socket.off("disconnect", handleDisconnect);
@@ -217,6 +289,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
         offer,
         submitOffer,
         cancelOffer,
+        answerOffer,
       }}
     >
       {children}

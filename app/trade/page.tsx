@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { isConnected, isStarted, me, other, offer, submitOffer, cancelOffer } = useSocket();
+  const { isConnected, isStarted, me, other, offer, submitOffer, cancelOffer, answerOffer } = useSocket();
   const [submittingOffer, setSubmittingOffer] = useState(false);
   const router = useRouter();
 
@@ -57,6 +57,12 @@ export default function Home() {
       .finally(() => {
         setSubmittingOffer(false);
       });
+  }
+
+  const handleAnswerOffer = (accept: boolean) => {
+    return () => {
+      answerOffer(accept).catch(alert);
+    }
   }
 
   return (
@@ -132,8 +138,10 @@ export default function Home() {
 
       {offer && offer.playerId === other?.id && (
         <OfferModal
-          givenItems={me?.inventory}
-          receivedItems={other?.inventory}
+          onAccept={handleAnswerOffer(true)}
+          onDecline={handleAnswerOffer(false)}
+          givenItems={me?.inventory.filter((item) => offer.receivedItemIds.includes(item.id))}
+          receivedItems={other?.inventory.filter((item) => offer.offeredItemIds.includes(item.id))}
         />
       )}
     </>

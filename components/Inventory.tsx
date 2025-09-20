@@ -42,6 +42,7 @@ interface InventoryProps {
   items?: InventoryItem[];
   disabled?: boolean; 
   selectedItemIds?: string[];
+  emptyMessage?: React.ReactNode;
   onToggleItem?: (id: string) => void;
 }
 
@@ -50,6 +51,7 @@ export function Inventory({
   items,
   selectedItemIds,
   disabled,
+  emptyMessage,
   onToggleItem,
 }: InventoryProps) {
   return (
@@ -71,7 +73,7 @@ export function Inventory({
 
         {items?.length === 0 && (
           <div className="text-white text-center py-8 col-span-full">
-            Inventory is empty
+            {emptyMessage || "Inventory is empty"}
           </div>
         )}
       </div>

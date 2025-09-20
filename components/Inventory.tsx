@@ -2,15 +2,17 @@ import Image from "next/image";
 import React from "react";
 import MdiCheck from "./icons/MdiCheck";
 
-function InventoryItem({
-  name,
-  selected,
-}: {
+interface InventoryItemProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
   selected?: boolean;
-}) {
+}
+
+function InventoryItem({ name, selected, ...props }: InventoryItemProps) {
   return (
-    <div className="bg-gray-700 p-1 rounded-lg relative hover:scale-105 transition-transform duration-200 hover:bg-gray-800 cursor-pointer">
+    <div
+      className="bg-gray-700 p-1 rounded-lg relative hover:scale-105 transition-transform duration-200 hover:bg-gray-800 cursor-pointer"
+      {...props}
+    >
       <Image
         src={`/assets/images/Ghostpixxells_pixelfood/${name}.png`}
         alt={name}
@@ -36,9 +38,15 @@ interface InventoryProps {
   title: React.ReactNode;
   items?: InventoryItem[];
   selectedItemIds?: string[];
+  onToggleItem?: (id: string) => void;
 }
 
-export function Inventory({ title, items, selectedItemIds }: InventoryProps) {
+export function Inventory({
+  title,
+  items,
+  selectedItemIds,
+  onToggleItem,
+}: InventoryProps) {
   return (
     <div>
       <div className="bg-gray-700 px-4 py-2 text-white">{title}</div>
@@ -50,6 +58,7 @@ export function Inventory({ title, items, selectedItemIds }: InventoryProps) {
           <InventoryItem
             selected={selectedItemIds?.includes(item.id)}
             key={i}
+            onClick={() => onToggleItem?.(item.id)}
             name={item.name}
           />
         ))}

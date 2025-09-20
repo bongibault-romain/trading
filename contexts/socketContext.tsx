@@ -12,6 +12,8 @@ interface SocketContextType {
   isStarted: boolean;
   me: { id: string; nickname: string; inventory: { id: string; name: string }[] } | null;
   other: { id: string; nickname: string; inventory: { id: string; name: string }[] } | null;
+  messages: { content: string; isSent: boolean; timeStamp: number }[];
+  sendMessage: (message: string) => Promise<void>;
 }
 
 export const SocketContext = createContext<SocketContextType | null>(null);
@@ -30,6 +32,18 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     inventory: { id: string; name: string }[];
   } | null>(null);
   const [socket, setSocket] = React.useState<Socket | null>(null);
+  const [messages, setMessages] = React.useState<{ content: string; isSent: boolean; timeStamp: number }[]>([]);
+
+  function sendMessage(message: string) {    
+    return new Promise<void>((resolve, reject) => {
+      if (!socket) return reject("No socket connection available.");
+
+      socket.emit("chatMessage", { message }, (accepted: boolean, error: string) => {
+        if (error) return reject(error);
+        resolve();
+      });
+    });
+  }
 
   useEffect(() => {
     if (socket && socket.connected) return;
@@ -46,10 +60,6 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
   }, [isConnected]);
 
   useEffect(() => {
-    console.log("Me changed:", me);
-  }, [me])
-
-  useEffect(() => {
     if (!socket) return;
 
     function handleDisconnect() {
@@ -57,6 +67,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setIsStarted(false);
       setMe(null);
       setOther(null);
+      setMessages([]);
     }
 
     function handleJoinedRoom({
@@ -64,9 +75,9 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     }: {
       player: { id: string; nickname: string; inventory: { id: string; name: string }[] };
     }, callback: () => void) {
-      console.log("Joined room:", player);
       setIsConnected(true);
       setIsStarted(false);
+      setMessages([]);
       setMe(player);
 
       callback();
@@ -81,14 +92,23 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setOther(players.find((p) => p.id !== me?.id) || null);
     }
 
+    function handleChatMessage({ playerId, content, timestamp }: { playerId: string; content: string; timestamp: number }) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { content, isSent: playerId === me?.id, timeStamp: timestamp },
+      ]);
+    }
+
     socket.on("joinedRoom", handleJoinedRoom);
     socket.on("gameStarting", handleGameStarting);
     socket.on("disconnect", handleDisconnect);
+    socket.on("chatMessage", handleChatMessage);
 
     return () => {
       socket.off("joinedRoom", handleJoinedRoom);
       socket.off("gameStarting", handleGameStarting);
       socket.off("disconnect", handleDisconnect);
+      socket.off("chatMessage", handleChatMessage);
     };
   }, [socket, me, other]);
 
@@ -100,7 +120,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <SocketContext.Provider
-      value={{ connect, isConnected, isStarted, me, other }}
+      value={{ connect, isConnected, isStarted, me, other, sendMessage, messages }}
     >
       {children}
     </SocketContext.Provider>

@@ -14,6 +14,7 @@ interface SocketContextType {
   other: { id: string; nickname: string; inventory: { id: string; name: string }[] } | null;
   messages: { content: string; isSent: boolean; timeStamp: number }[];
   sendMessage: (message: string) => Promise<void>;
+  offer: { playerId: string; offeredItemIds: string[]; receivedItemIds: string[] } | null;
 }
 
 export const SocketContext = createContext<SocketContextType | null>(null);
@@ -33,6 +34,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
   } | null>(null);
   const [socket, setSocket] = React.useState<Socket | null>(null);
   const [messages, setMessages] = React.useState<{ content: string; isSent: boolean; timeStamp: number }[]>([]);
+  const [offer, setOffer] = React.useState<{ playerId: string; offeredItemIds: string[]; receivedItemIds: string[] } | null>(null); 
 
   function sendMessage(message: string) {    
     return new Promise<void>((resolve, reject) => {
@@ -120,7 +122,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <SocketContext.Provider
-      value={{ connect, isConnected, isStarted, me, other, sendMessage, messages }}
+      value={{ connect, isConnected, isStarted, me, other, sendMessage, messages, offer }}
     >
       {children}
     </SocketContext.Provider>

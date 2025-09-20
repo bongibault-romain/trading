@@ -62,7 +62,14 @@ export function Inventory({
             name={item.name}
           />
         ))}
+
+        {items?.length === 0 && (
+          <div className="text-white text-center py-8 col-span-full">
+            Inventory is empty
+          </div>
+        )}
       </div>
+
     </div>
   );
 }

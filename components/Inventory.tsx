@@ -1,34 +1,44 @@
 import Image from "next/image";
 import React from "react";
+import MdiCheck from "./icons/MdiCheck";
+
+function InventoryItem({
+  name,
+  selected,
+}: {
+  name: string;
+  selected?: boolean;
+}) {
+  return (
+    <div className="bg-gray-700 p-1 rounded-lg relative hover:scale-105 transition-transform duration-200 hover:bg-gray-800 cursor-pointer">
+      <Image
+        src={`/assets/images/Ghostpixxells_pixelfood/${name}.png`}
+        alt={name}
+        width={48}
+        height={48}
+      />
+
+      {selected && (
+        <div className="absolute flex items-center justify-center text-white top-0 left-0 w-full h-full bg-black/50 rounded-lg pointer-events-none">
+          <MdiCheck height={32} width={32} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+}
 
 interface InventoryProps {
   title: React.ReactNode;
+  items?: InventoryItem[];
+  selectedItemIds?: string[];
 }
 
-export function Inventory({ title }: InventoryProps) {
-  const items = [
-    "12_bun_dish",
-    "14_bacon_dish",
-    "23_cheesecake_dish",
-    "27_chocolate_dish",
-    "29_cookies_dish",
-    "12_bun_dish",
-    "14_bacon_dish",
-    "23_cheesecake_dish",
-    "27_chocolate_dish",
-    "29_cookies_dish",
-    "12_bun_dish",
-    "14_bacon_dish",
-    "23_cheesecake_dish",
-    "27_chocolate_dish",
-    "29_cookies_dish",
-    "12_bun_dish",
-    "14_bacon_dish",
-    "23_cheesecake_dish",
-    "27_chocolate_dish",
-    "29_cookies_dish",
-  ];
-
+export function Inventory({ title, items, selectedItemIds }: InventoryProps) {
   return (
     <div>
       <div className="bg-gray-700 px-4 py-2 text-white">{title}</div>
@@ -36,15 +46,12 @@ export function Inventory({ title }: InventoryProps) {
         className="grid gap-2 w-full flex-wrap p-2 bg-gray-600"
         style={{ gridTemplateColumns: "repeat(auto-fill, minmax(48px, 1fr))" }}
       >
-        {items.map((item, i) => (
-          <div key={i} className="bg-gray-700 p-1 rounded-lg">
-            <Image
-              src={`/assets/images/Ghostpixxells_pixelfood/${item}.png`}
-              alt={item}
-              width={48}
-              height={48}
-            />
-          </div>
+        {items?.map((item, i) => (
+          <InventoryItem
+            selected={selectedItemIds?.includes(item.id)}
+            key={i}
+            name={item.name}
+          />
         ))}
       </div>
     </div>

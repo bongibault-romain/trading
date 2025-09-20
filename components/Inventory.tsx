@@ -5,12 +5,15 @@ import MdiCheck from "./icons/MdiCheck";
 interface InventoryItemProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
   selected?: boolean;
+  disabled?: boolean;
 }
 
 function InventoryItem({ name, selected, ...props }: InventoryItemProps) {
+  const hoverClass = props.disabled ? '' : 'hover:scale-105 transition-transform duration-200 hover:bg-gray-800 cursor-pointer';
+
   return (
     <div
-      className="bg-gray-700 p-1 rounded-lg relative hover:scale-105 transition-transform duration-200 hover:bg-gray-800 cursor-pointer"
+      className={`bg-gray-700 p-1 rounded-lg relative ${hoverClass}`}
       {...props}
     >
       <Image
@@ -37,6 +40,7 @@ export interface InventoryItem {
 interface InventoryProps {
   title: React.ReactNode;
   items?: InventoryItem[];
+  disabled?: boolean; 
   selectedItemIds?: string[];
   onToggleItem?: (id: string) => void;
 }
@@ -45,6 +49,7 @@ export function Inventory({
   title,
   items,
   selectedItemIds,
+  disabled,
   onToggleItem,
 }: InventoryProps) {
   return (
@@ -58,7 +63,8 @@ export function Inventory({
           <InventoryItem
             selected={selectedItemIds?.includes(item.id)}
             key={i}
-            onClick={() => onToggleItem?.(item.id)}
+            onClick={() => !disabled && onToggleItem?.(item.id)}
+            disabled={disabled}
             name={item.name}
           />
         ))}

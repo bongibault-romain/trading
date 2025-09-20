@@ -5,6 +5,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .chat-scrollbar::-webkit-scrollbar {
   width: 8px;
   height: 20px;

@@ -15,7 +15,7 @@ interface SocketContextType {
   messages: { content: string; isSent: boolean; timeStamp: number }[];
   sendMessage: (message: string) => Promise<void>;
   offer: { playerId: string; offeredItemIds: string[]; receivedItemIds: string[] } | null;
-  makeOffer?: (offeredItemIds: string[], receivedItemIds: string[]) => void;
+  submitOffer: (offeredItemIds: string[], receivedItemIds: string[]) => Promise<void>;
 }
 
 export const SocketContext = createContext<SocketContextType | null>(null);
@@ -49,11 +49,11 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     });
   }
 
-  function makeOffer(offeredItemIds: string[], receivedItemIds: string[]) {
+  function submitOffer(offeredItemIds: string[], receivedItemIds: string[]) {
     return new Promise<void>((resolve, reject) => {
       if (!socket) return reject("No socket connection available.");
 
-      socket.emit("makeOffer", { offeredItemIds, receivedItemIds }, (accepted: boolean, error: string) => {
+      socket.emit("submitOffer", { offeredItemIds, receivedItemIds }, (accepted: boolean, error: string) => {
         if (error) return reject(error);
         if (!accepted) return reject("Offer not accepted by server.");
 
@@ -138,7 +138,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <SocketContext.Provider
-      value={{ connect, isConnected, isStarted, me, other, sendMessage, messages, offer, makeOffer }}
+      value={{ connect, isConnected, isStarted, me, other, sendMessage, messages, offer, submitOffer }}
     >
       {children}
     </SocketContext.Provider>

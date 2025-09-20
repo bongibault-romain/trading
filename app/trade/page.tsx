@@ -9,14 +9,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { isConnected, isStarted, me, other, offer } = useSocket();
+  const { isConnected, isStarted, me, other, offer, submitOffer } = useSocket();
+  const [SubmittingOffer, setSubmittingOffer] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (isStarted && isConnected) return;
 
     router.push("/");
-  }, [isStarted]);
+  }, [isStarted, isConnected]);
 
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [selectedOtherItemIds, setSelectedOtherItemIds] = useState<string[]>(
@@ -34,6 +35,17 @@ export default function Home() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
+
+  const handleSubmitOffer = () => {
+    if (offer) return;
+    setSubmittingOffer(true);
+
+    submitOffer(selectedItemIds, selectedOtherItemIds)
+      .catch(alert)
+      .finally(() => {
+        setSubmittingOffer(false);
+      });
+  }
 
   return (
     <>
@@ -89,8 +101,13 @@ export default function Home() {
             </div>
 
             <div className="flex justify-end">
-              <Button variant="danger">Cancel Offer</Button>
-              <Button variant="primary">Make an Offer</Button>
+              {offer && offer.playerId === me?.id ? (
+                <Button variant="danger">Cancel Offer</Button>
+              ) : (
+                <Button variant="primary" onClick={handleSubmitOffer} disabled={SubmittingOffer}>
+                  {SubmittingOffer ? "Making Offer..." : "Make an Offer"}
+                </Button>
+              )}
             </div>
           </div>
           <div className="col-span-12 lg:col-span-3">

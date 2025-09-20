@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { connect, isConnected, isStarted, me, other } = useSocket();
+  const { isConnected, isStarted, me, other } = useSocket();
   const router = useRouter();
 
   useEffect(() => {

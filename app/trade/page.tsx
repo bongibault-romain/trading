@@ -65,6 +65,13 @@ export default function Home() {
     }
   }
 
+  useEffect(() => {
+    if (!offer) {
+      setSelectedItemIds([]);
+      setSelectedOtherItemIds([]);
+    }
+  }, [offer])
+
   return (
     <>
       <main className="w-full h-screen md:max-w-5xl p-4 mx-auto">

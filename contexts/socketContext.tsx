@@ -217,6 +217,10 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     }
 
     function handleOfferCancelled() {
+      if (offer?.playerId === me?.id) {
+        alert("Your offer has been cancelled.");
+      }
+
       setOffer(null);
     }
 
@@ -268,7 +272,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
       socket.off("disconnect", handleDisconnect);
       socket.off("chatMessage", handleChatMessage);
     };
-  }, [socket, me, other]);
+  }, [socket, me, other, offer]);
 
   const connect = (nickname: string) => {
     if (!socket) return;

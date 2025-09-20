@@ -99,7 +99,6 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
       socket.emit(
         "cancelOffer",
-        {},
         (accepted: boolean, error: string | undefined) => {
           if (error) return reject(error);
           if (!accepted) return reject("Cancel offer not accepted by server.");

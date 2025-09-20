@@ -10,8 +10,8 @@ interface SocketContextType {
   connect: (nickname: string) => void;
   isConnected: boolean;
   isStarted: boolean;
-  me: { id: string; nickname: string; inventory: string[] } | null;
-  other: { id: string; nickname: string; inventory: string[] } | null;
+  me: { id: string; nickname: string; inventory: { id: string; name: string }[] } | null;
+  other: { id: string; nickname: string; inventory: { id: string; name: string }[] } | null;
 }
 
 export const SocketContext = createContext<SocketContextType | null>(null);
@@ -22,12 +22,12 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [me, setMe] = React.useState<{
     id: string;
     nickname: string;
-    inventory: string[];
+    inventory: { id: string; name: string }[];
   } | null>(null);
   const [other, setOther] = React.useState<{
     id: string;
     nickname: string;
-    inventory: string[];
+    inventory: { id: string; name: string }[];
   } | null>(null);
   const [socket, setSocket] = React.useState<Socket | null>(null);
 
@@ -62,7 +62,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     function handleJoinedRoom({
       player,
     }: {
-      player: { id: string; nickname: string; inventory: string[] };
+      player: { id: string; nickname: string; inventory: { id: string; name: string }[] };
     }, callback: () => void) {
       console.log("Joined room:", player);
       setIsConnected(true);
@@ -75,7 +75,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     function handleGameStarting({
       players,
     }: {
-      players: { id: string; nickname: string; inventory: string[] }[];
+      players: { id: string; nickname: string; inventory: { id: string; name: string }[] }[];
     }) {
       setIsStarted(true);
       setOther(players.find((p) => p.id !== me?.id) || null);

@@ -3,9 +3,12 @@
 import { useSocket } from "@/hooks/useSocket";
 import MdiChevronRight from "../components/icons/MdiChevronRight";
 import Button from "@/components/Button";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const { connect, isConnected, isStarted, me, other } = useSocket();
+  const { connect, isConnected, isStarted } = useSocket();
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -15,6 +18,12 @@ export default function Home() {
 
     connect(nickname);
   };
+
+  useEffect(() => {
+    if (!isStarted) return;
+
+    router.push('/trade');
+  }, [isStarted]);
 
   return (
     <main className="w-screen h-screen flex flex-col items-center justify-center">

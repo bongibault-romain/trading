@@ -5,7 +5,7 @@ import MdiChevronRight from "../components/icons/MdiChevronRight";
 import Button from "@/components/Button";
 
 export default function Home() {
-  const { connect, isConnected, isStarted } = useSocket();
+  const { connect, isConnected, isStarted, me, other } = useSocket();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

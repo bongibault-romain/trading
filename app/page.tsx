@@ -10,7 +10,6 @@ export default function Home() {
           
           <Button>
             <MdiChevronRight width={24} height={24} />
-
           </Button>
         </div>
       </form>

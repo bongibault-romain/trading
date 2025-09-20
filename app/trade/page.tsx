@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@/components/Button";
 import Chat from "@/components/Chat";
 import Inventory from "@/components/Inventory";
 import { useSocket } from "@/hooks/useSocket";
@@ -51,6 +52,11 @@ export default function Home() {
           items={other?.inventory}
           onToggleItem={handleToggleOtherItem}
         />
+
+        <div className="flex justify-end">
+          <Button variant="danger">Cancel Offer</Button>
+          <Button variant="primary">Make an Offer</Button>
+        </div>
       </div>
       <div className="col-span-12 lg:col-span-3">
         <Inventory title={"Inventory of Anna"} />

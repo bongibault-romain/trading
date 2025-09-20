@@ -31,7 +31,7 @@ export default function Home() {
         { !isConnected && (<div className="flex">
           <input className="bg-gray-700 outline-0 text-white px-4 py-2" type="text" name="nickname" placeholder="Enter your nickname" />
           
-          <Button type="submit" disabled={isStarted}>
+          <Button variant="secondary" type="submit" disabled={isStarted}>
             <MdiChevronRight width={24} height={24} />
           </Button>
         </div>) }

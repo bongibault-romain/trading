@@ -84,7 +84,7 @@ export function Chat({ title }: ChatProps) {
           onChange={(e) => setMessage(e.target.value)}
         />
 
-        <Button className="flex items-center justify-center" type="submit" disabled={sending || !message.trim()}>
+        <Button variant="secondary" className="flex items-center justify-center" type="submit" disabled={sending || !message.trim()}>
             {sending ? (
               <span className="loader" style={{ height: "24px", width: "24px", borderWidth: '2px' }}></span>
             ) : (

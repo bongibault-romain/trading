@@ -67,7 +67,7 @@ export default function Home() {
 
   return (
     <>
-      <main className="w-full h-screen md:max-w-7xl p-4 mx-auto">
+      <main className="w-full h-screen md:max-w-5xl p-4 mx-auto">
         <h1 className="text-4xl font-bold text-white py-8">
           Welcome {me?.nickname}.{" "}
           <small className="text-gray-300">
@@ -75,13 +75,13 @@ export default function Home() {
           </small>
         </h1>
 
-        <div className="grid grid-cols-12 gap-x-0 gap-y-8 lg:gap-8 w-full">
+        <div className="grid grid-cols-10 gap-x-0 gap-y-8 lg:gap-8 w-full">
           <div className="col-span-12 lg:col-span-4">
             <Chat
               title={"Live Chat with " + (other?.nickname || "Other Player")}
             />
           </div>
-          <div className="col-span-12 lg:col-span-5 flex flex-col gap-4">
+          <div className="col-span-12 lg:col-span-6 flex flex-col gap-4">
             <div className="bg-gray-700 px-4 py-2 text-white">
               <p className="text-justify">
                 <strong>Tips: </strong> Select the items you want to give to{" "}
@@ -101,7 +101,9 @@ export default function Home() {
               />
 
               {offer && (
-                <div className="absolute inset-0 bg-black/50 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-black/70 pointer-events-none flex items-center justify-center">
+                  <p className="text-white text-center">Waiting for {other?.nickname} to respond...</p>
+                </div>
               )}
             </div>
 
@@ -114,7 +116,9 @@ export default function Home() {
                 onToggleItem={handleToggleOtherItem}
               />
               {offer && (
-                <div className="absolute inset-0 bg-black/50 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-black/70 pointer-events-none flex items-center justify-center">
+                  <p className="text-white text-center">Waiting for {other?.nickname} to respond...</p>
+                </div>
               )}
             </div>
 
@@ -124,14 +128,11 @@ export default function Home() {
                   {submittingOffer ? "Cancelling..." : "Cancel Offer"}
                 </Button>
               ) : (
-                <Button variant="primary" onClick={handleSubmitOffer} disabled={submittingOffer}>
+                <Button variant="primary" onClick={handleSubmitOffer} disabled={submittingOffer || selectedItemIds.length === 0 && selectedOtherItemIds.length === 0}>
                   {submittingOffer ? "Making Offer..." : "Make an Offer"}
                 </Button>
               )}
             </div>
-          </div>
-          <div className="col-span-12 lg:col-span-3">
-            <Inventory title={"Inventory of Anna"} />
           </div>
         </div>
       </main>

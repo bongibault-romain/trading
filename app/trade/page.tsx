@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <main className="w-screen h-screen grid grid-cols-12 gap-8 p-8 md:max-w-7xl mx-auto">
       <div className="col-span-12 lg:col-span-4">
-        <Chat />
+        <Chat title={"Live Chat with " + (other?.nickname || "Other Player")} />
       </div>
       <div className="col-span-12 lg:col-span-5 flex flex-col gap-4">
         <Inventory
@@ -46,7 +46,7 @@ export default function Home() {
           onToggleItem={handleToggleItem}
         />
         <Inventory
-          title={"Inventory of Elsa"}
+          title={"Inventory of " + (other?.nickname || "Other Player")}
           selectedItemIds={selectedOtherItemIds}
           items={other?.inventory}
           onToggleItem={handleToggleOtherItem}

@@ -51,7 +51,7 @@ export function Inventory({
     <div>
       <div className="bg-gray-700 px-4 py-2 text-white">{title}</div>
       <div
-        className="grid gap-2 w-full flex-wrap p-2 bg-gray-600"
+        className="grid gap-2 w-full flex-wrap p-2 bg-gray-600 select-none"
         style={{ gridTemplateColumns: "repeat(auto-fill, minmax(48px, 1fr))" }}
       >
         {items?.map((item, i) => (

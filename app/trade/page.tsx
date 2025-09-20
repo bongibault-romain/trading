@@ -40,6 +40,15 @@ export default function Home() {
         <Chat title={"Live Chat with " + (other?.nickname || "Other Player")} />
       </div>
       <div className="col-span-12 lg:col-span-5 flex flex-col gap-4">
+        <div className="bg-gray-700 px-4 py-2 text-white">
+          <p className="text-justify">
+            <strong>Tips: </strong> Select the items you want to give to{" "}
+            {other?.nickname} from your inventory and select the items you want
+            to receive from {other?.nickname}'s inventory. Then click "Make an
+            Offer" to propose the trade.
+          </p>
+        </div>
+
         <Inventory
           title={"Your Inventory"}
           selectedItemIds={selectedItemIds}

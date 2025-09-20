@@ -10,12 +10,28 @@ interface SocketContextType {
   connect: (nickname: string) => void;
   isConnected: boolean;
   isStarted: boolean;
-  me: { id: string; nickname: string; inventory: { id: string; name: string }[] } | null;
-  other: { id: string; nickname: string; inventory: { id: string; name: string }[] } | null;
+  me: {
+    id: string;
+    nickname: string;
+    inventory: { id: string; name: string }[];
+  } | null;
+  other: {
+    id: string;
+    nickname: string;
+    inventory: { id: string; name: string }[];
+  } | null;
   messages: { content: string; isSent: boolean; timeStamp: number }[];
   sendMessage: (message: string) => Promise<void>;
-  offer: { playerId: string; offeredItemIds: string[]; receivedItemIds: string[] } | null;
-  submitOffer: (offeredItemIds: string[], receivedItemIds: string[]) => Promise<void>;
+  offer: {
+    playerId: string;
+    offeredItemIds: string[];
+    receivedItemIds: string[];
+  } | null;
+  submitOffer: (
+    offeredItemIds: string[],
+    receivedItemIds: string[]
+  ) => Promise<void>;
+  cancelOffer: () => Promise<void>;
 }
 
 export const SocketContext = createContext<SocketContextType | null>(null);
@@ -34,18 +50,28 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     inventory: { id: string; name: string }[];
   } | null>(null);
   const [socket, setSocket] = React.useState<Socket | null>(null);
-  const [messages, setMessages] = React.useState<{ content: string; isSent: boolean; timeStamp: number }[]>([]);
-  const [offer, setOffer] = React.useState<{ playerId: string; offeredItemIds: string[]; receivedItemIds: string[] } | null>(null); 
+  const [messages, setMessages] = React.useState<
+    { content: string; isSent: boolean; timeStamp: number }[]
+  >([]);
+  const [offer, setOffer] = React.useState<{
+    playerId: string;
+    offeredItemIds: string[];
+    receivedItemIds: string[];
+  } | null>(null);
 
-  function sendMessage(message: string) {    
+  function sendMessage(message: string) {
     return new Promise<void>((resolve, reject) => {
       if (!socket) return reject("No socket connection available.");
 
-      socket.emit("chatMessage", { message }, (accepted: boolean, error: string) => {
-        if (error) return reject(error);
-        if (!accepted) return reject("Message not accepted by server.");
-        resolve();
-      });
+      socket.emit(
+        "chatMessage",
+        { message },
+        (accepted: boolean, error: string | undefined) => {
+          if (error) return reject(error);
+          if (!accepted) return reject("Message not accepted by server.");
+          resolve();
+        }
+      );
     });
   }
 
@@ -53,14 +79,36 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     return new Promise<void>((resolve, reject) => {
       if (!socket) return reject("No socket connection available.");
 
-      socket.emit("submitOffer", { offeredItemIds, receivedItemIds }, (accepted: boolean, error: string) => {
-        if (error) return reject(error);
-        if (!accepted) return reject("Offer not accepted by server.");
+      socket.emit(
+        "submitOffer",
+        { offeredItemIds, receivedItemIds },
+        (accepted: boolean, error: string | undefined) => {
+          if (error) return reject(error);
+          if (!accepted) return reject("Offer not accepted by server.");
 
-        setOffer({ playerId: me?.id || "", offeredItemIds, receivedItemIds });
-        resolve();
-      });
-    })
+          setOffer({ playerId: me?.id || "", offeredItemIds, receivedItemIds });
+          resolve();
+        }
+      );
+    });
+  }
+
+  function cancelOffer() {
+    return new Promise<void>((resolve, reject) => {
+      if (!socket) return reject("No socket connection available.");
+
+      socket.emit(
+        "cancelOffer",
+        {},
+        (accepted: boolean, error: string | undefined) => {
+          if (error) return reject(error);
+          if (!accepted) return reject("Cancel offer not accepted by server.");
+
+          setOffer(null);
+          resolve();
+        }
+      );
+    });
   }
 
   useEffect(() => {
@@ -88,11 +136,18 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setMessages([]);
     }
 
-    function handleJoinedRoom({
-      player,
-    }: {
-      player: { id: string; nickname: string; inventory: { id: string; name: string }[] };
-    }, callback: () => void) {
+    function handleJoinedRoom(
+      {
+        player,
+      }: {
+        player: {
+          id: string;
+          nickname: string;
+          inventory: { id: string; name: string }[];
+        };
+      },
+      callback: () => void
+    ) {
       setIsConnected(true);
       setIsStarted(false);
       setMessages([]);
@@ -104,13 +159,25 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     function handleGameStarting({
       players,
     }: {
-      players: { id: string; nickname: string; inventory: { id: string; name: string }[] }[];
+      players: {
+        id: string;
+        nickname: string;
+        inventory: { id: string; name: string }[];
+      }[];
     }) {
       setIsStarted(true);
       setOther(players.find((p) => p.id !== me?.id) || null);
     }
 
-    function handleChatMessage({ playerId, content, timestamp }: { playerId: string; content: string; timestamp: number }) {
+    function handleChatMessage({
+      playerId,
+      content,
+      timestamp,
+    }: {
+      playerId: string;
+      content: string;
+      timestamp: number;
+    }) {
       setMessages((prevMessages) => [
         ...prevMessages,
         { content, isSent: playerId === me?.id, timeStamp: timestamp },
@@ -138,7 +205,18 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <SocketContext.Provider
-      value={{ connect, isConnected, isStarted, me, other, sendMessage, messages, offer, submitOffer }}
+      value={{
+        connect,
+        isConnected,
+        isStarted,
+        me,
+        other,
+        sendMessage,
+        messages,
+        offer,
+        submitOffer,
+        cancelOffer,
+      }}
     >
       {children}
     </SocketContext.Provider>

@@ -132,6 +132,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setIsStarted(false);
       setMe(null);
       setOther(null);
+      setOffer(null);
       setMessages([]);
     }
 
@@ -150,6 +151,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setIsConnected(true);
       setIsStarted(false);
       setMessages([]);
+      setOffer(null);
       setMe(player);
 
       callback();

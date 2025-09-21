@@ -139,7 +139,6 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setSocket(io(process.env.NEXT_PUBLIC_API_URL, {
       tryAllTransports: false,
       transports: ['websocket'],
-      path: '/'
     }));
 
     return () => {

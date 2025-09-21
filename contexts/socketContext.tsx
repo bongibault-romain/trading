@@ -136,7 +136,9 @@ export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
       return;
     }
 
-    setSocket(io(process.env.NEXT_PUBLIC_API_URL));
+    setSocket(io(process.env.NEXT_PUBLIC_API_URL, {
+      transports: ['websocket'],
+    }));
 
     return () => {
       socket?.disconnect();
